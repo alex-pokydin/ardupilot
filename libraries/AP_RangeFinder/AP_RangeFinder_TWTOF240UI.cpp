@@ -111,7 +111,7 @@ bool AP_RangeFinder_TWTOF240UI::get_reading(uint16_t &reading_mm)
     reading_mm = distHi * 256 + distLo;
     
     // ignore failed readings
-    if(reading_mm < 0 || reading_mm > 2.5){
+    if(reading_mm > 3000){
         return false;
     }
 
