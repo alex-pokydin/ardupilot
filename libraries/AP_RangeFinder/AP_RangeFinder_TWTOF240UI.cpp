@@ -105,18 +105,15 @@ bool AP_RangeFinder_TWTOF240UI::get_reading(uint16_t &reading_mm)
         return false;
     }
 
-    // uint8_t cmdCode      = buf[0];
-    // uint8_t dataLen      = buf[1];
     uint8_t distHi       = buf[2];
     uint8_t distLo       = buf[3];
-    // uint8_t range1Status = buf[4];
 
-    // combine results into distance
-    // if(cmdCode != TOFM_CMD_ST_MM || dataLen != 3 || range1Status == 0){
-    //   reading_mm = 0;
-    // } else {
-      reading_mm = distHi * 256 + distLo;
-    // }
+    reading_mm = distHi * 256 + distLo;
+    
+    // ignore failed readings
+    if(reading_mm < 0 || reading_mm > 2.5){
+        return false;
+    }
 
     return true;
 }
