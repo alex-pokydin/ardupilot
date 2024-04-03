@@ -61,6 +61,7 @@
 #include "AP_RangeFinder_JRE_Serial.h"
 #include "AP_RangeFinder_Ainstein_LR_D1.h"
 #include "AP_RangeFinder_RDS02UF.h"
+#include "AP_RangeFinder_TWTOF240UI.h"
 
 #include <AP_BoardConfig/AP_BoardConfig.h>
 #include <AP_Logger/AP_Logger.h>
@@ -595,6 +596,19 @@ void RangeFinder::detect_instance(uint8_t instance, uint8_t& serial_instance)
 #if AP_RANGEFINDER_RDS02UF_ENABLED
     case Type::RDS02UF:
         serial_create_fn = AP_RangeFinder_RDS02UF::create;
+#endif
+
+#if AP_RANGEFINDER_TWTOF240UI_ENABLED
+    case Type::TWTOF240UI:
+        FOREACH_I2C(i) {
+            if (_add_backend(AP_RangeFinder_TWTOF240UI::detect(
+                                 state[instance],
+                                 params[instance],
+                                 hal.i2c_mgr->get_device(i, 0x36)),
+                             instance)) {
+                break;
+            }
+        }
         break;
 #endif
     case Type::NONE:
