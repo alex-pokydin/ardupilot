@@ -78,14 +78,31 @@ bool AP_RangeFinder_TWTOF240UI::_init(void)
 {
     WITH_SEMAPHORE(_dev->get_semaphore());
 
-    uint16_t reading_mm;
-    if (!get_reading(reading_mm)) {
+    if (!check_reading()) {
         return false;
     }
 
     _dev->register_periodic_callback(
         100000,
         FUNCTOR_BIND_MEMBER(&AP_RangeFinder_TWTOF240UI::_timer, void));
+
+    return true;
+}
+
+// read - return last value measured by sensor
+bool AP_RangeFinder_TWTOF240UI::check_reading()
+{
+    uint8_t buf[5];
+
+    _dev->write_register(TOFM_CMD_START_FLAG, 0x01);
+    hal.scheduler->delay_microseconds(10);
+
+    _dev->write_register(TOFM_CMD_ST_MM, 0x01);
+    hal.scheduler->delay_microseconds(10);
+
+    if (!_dev->read_registers(TOFM_CMD_ST_MM, buf, 5)) {
+        return false;
+    }
 
     return true;
 }
